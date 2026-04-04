@@ -1,13 +1,33 @@
 const express = require("express");
-
 const app = express();
 
-app.get("/user/:userId/:name/:password",(req,res)=>{
-    console.log(req.params)
-    res.send({firstname:"tushar",lastname:"makvana"})
-});
+// app.use("/route", rH, [rH2, rH3], rH4, rH5);
 
+app.use("/user",(req,res,next)=>{
+    console.log("this is the response!!")
+    next();
+},
+ (req,res,next)=>{
+    // res.send("this is the response2!!")
+    console.log("this is the response2!!")
+    next();
+ },
+ [(req,res,next)=>{
+    // res.send("this is the response3!!");
+    console.log("this is the response3!!")
+    next();
+ },
+ (req,res,next)=>{
+    // res.send("this is the response4!!");
+    console.log("this is the response4!!")
+    next();
+ },
+ (req,res,next)=>{
+    console.log("this is the response5!!");
+    res.send("5 response!!!");
+ }
+]);
 
-app.listen(3000, () => {
-    console.log("server is successfully listening on port 3000....");
-});
+app.listen(7777,()=>{
+    console.log("This is the listen of the 7777..")
+})
