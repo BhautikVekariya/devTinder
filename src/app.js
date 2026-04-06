@@ -1,32 +1,29 @@
 const express = require("express");
 const app = express();
 
-// app.use("/route", rH, [rH2, rH3], rH4, rH5);
+// Handle Auth Middleware for all GET, POST, ... request
+const {adminAuth,userAuth} = require("./middlewares/auth")
+app.use("/admin", adminAuth);
 
-app.use("/user",(req,res,next)=>{
-    console.log("this is the response!!")
-    next();
-},
- (req,res,next)=>{
-    // res.send("this is the response2!!")
-    console.log("this is the response2!!")
-    next();
- },
- [(req,res,next)=>{
-    // res.send("this is the response3!!");
-    console.log("this is the response3!!")
-    next();
- },
- (req,res,next)=>{
-    // res.send("this is the response4!!");
-    console.log("this is the response4!!")
-    next();
- },
- (req,res,next)=>{
-    console.log("this is the response5!!");
-    res.send("5 response!!!");
- }
-]);
+app.get("/user/login",(req,res)=>{
+     res.send("User logged in successfully!");
+});
+
+app.get("/user/data",userAuth,(req,res)=>{
+   res.send("User Data Send"); 
+})
+
+
+app.get("/admin/getAllData", (req,res)=>{
+   //  Logic of checking if the request is authorized
+      res.send("All Data Send");
+ 
+});
+
+app.get("/admin/deleteUser", (req,res)=>{
+   //   Logic of checking if the request is authorized.
+      res.send("Deleted a user");
+});
 
 app.listen(7777,()=>{
     console.log("This is the listen of the 7777..")
