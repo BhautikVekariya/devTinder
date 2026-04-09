@@ -3,15 +3,13 @@ const app = express();
 const connetDB = require("./config/database");
 const User = require("./models/user")
 
-app.post("/signup", async (req,res)=>{
-    // Creating a new instance of the User model
-     const user = new User({
-        firstName:"Bhautik",
-        lastName:"Vekariya",
-        emailId:"bhautik@gmail.com",
-        password:"Bhautik@123",
-     });
+app.use(express.json());
 
+app.post("/signup", async (req,res)=>{
+    console.log(req.body);
+
+    // Creating a new instance of the User model
+     const user = new User(req.body);
   try{
       await user.save();
        res.send("User Added Successfully!");
