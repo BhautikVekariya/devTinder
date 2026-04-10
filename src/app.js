@@ -18,6 +18,41 @@ app.post("/signup", async (req,res)=>{
   }   
 });
 
+app.get("/user", async (req,res)=>{
+    const userEmail = req.body.emailId;
+
+    try{
+        console.log(userEmail);
+        const users = await User.findOne({emailId: userEmail});
+
+        if(!users){
+            res.status(404).send("User not found");
+        }else{
+
+            res.send(users);
+        }
+    //   const users = await User.find({emailId: userEmail})
+    //   if(users.length === 0){
+    //     res.status(404).send("User not found")
+    //   }else{
+    //     res.send(users);
+    //   }
+    }catch(err){
+        res.status(404).send("Somethig went wrong");
+    }
+})
+
+
+// Feed API - GET/feed - get all the users from the database
+app.get("/feed", async (req,res)=>{
+    try{
+      const users = await User.find({});
+      res.send(users);
+    }catch(err){
+        res.status(404).send("Somethig Went Wrong")
+    }
+})
+
 connetDB()
 .then(()=>{
     console.log("Database connection established..")
