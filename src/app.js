@@ -18,19 +18,20 @@ app.post("/signup", async (req,res)=>{
   }   
 });
 
+// Get user by email 
 app.get("/user", async (req,res)=>{
     const userEmail = req.body.emailId;
 
     try{
-        console.log(userEmail);
-        const users = await User.findOne({emailId: userEmail});
+        // console.log(userEmail);
+        const users = await User.findOne({emailId: userEmail}).exec();
 
         if(!users){
             res.status(404).send("User not found");
         }else{
 
             res.send(users);
-        }
+        }    
     //   const users = await User.find({emailId: userEmail})
     //   if(users.length === 0){
     //     res.status(404).send("User not found")
@@ -53,6 +54,32 @@ app.get("/feed", async (req,res)=>{
     }
 })
 
+// Delete a user from the database
+app.delete("/user", async (req,res)=>{
+    const userId = req.body.userId;
+    try{
+      const user = await User.findByIdAndDelete({_id:userId});
+      res.send("user deleted Successfully");
+    }catch(err){
+        res.status(404).send("Something went wrong");
+    }
+})
+
+// Update data of a user
+
+app.patch("/user", async (req,res)=>{
+    const userId = req.body.userId;
+    const data = req.body;
+    console.log(data);
+    try{
+       const user = await User.findByIdAndUpdate({_id:userId}, data, {returnDocument :"before", runValidators:true});
+       console.log(user)
+        res.send("User updated successfully")
+    }catch(err){
+        res.status(404).send("Something went wrong");
+    }
+})
+
 connetDB()
 .then(()=>{
     console.log("Database connection established..")
@@ -61,7 +88,7 @@ connetDB()
 })
 })
 .catch((err)=>{
-    console.log("Database cannot be connted.")
+    console.log("Database cannot be connted." + err)
 })
 
 
