@@ -2,21 +2,58 @@ const express = require("express");
 const app = express();
 const connetDB = require("./config/database");
 const User = require("./models/user")
+const { validateSignUpData } = require("./utils/validation");
+const bcrypt = require("bcrypt");
 
 app.use(express.json());
 
 app.post("/signup", async (req, res) => {
-    console.log(req.body);
 
-    // Creating a new instance of the User model
-    const user = new User(req.body);
     try {
+        // validation of data
+
+        validateSignUpData(req);
+
+        const {firstName, lastName, emailId, password } = req.body;
+        //  Encrypt the password
+        const passwordHash = await bcrypt.hash(password, 10);
+        console.log(passwordHash)
+
+        // Creating a new instance of the User model
+        const user = new User({
+            firstName, 
+            lastName, 
+            emailId, 
+            password: passwordHash,
+        });
         await user.save();
         res.send("User Added Successfully!");
     } catch (err) {
-        res.status(400).send("Error Saving the User:" + err.message)
+        res.status(400).send("Error :" + err.message)
     }
 });
+
+app.post("/login", async (req,res)=>{
+    try{
+       const {emailId, password} = req.body;
+
+       const user = await User.findOne({emailId: emailId});
+
+       if(!user){
+         throw new Error("Invalid Credentials");
+       }
+       const isPasswordValid = await bcrypt.compare(password, user.password);
+
+       if(isPasswordValid){
+        res.send("Login Successfully!!");
+       }else{
+        throw new Error("Invalid Credentials");
+       }
+    }
+    catch(err){
+        res.status(400).send("ERROR :" + err.message);
+    }
+})
 
 // Get user by email 
 app.get("/user", async (req, res) => {
@@ -73,12 +110,12 @@ app.patch("/user/:userId", async (req, res) => {
     console.log(data);
     try {
         const ALLOWED_UPDATES = [
-            "userId", 
+            "userId",
             "photoUrl",
-             "about", 
-             "gender", 
-             "age", 
-             "skills",
+            "about",
+            "gender",
+            "age",
+            "skills",
         ];
 
         const isUpdateAllowed = Object.keys(data).every((k) => ALLOWED_UPDATES.includes(k));
